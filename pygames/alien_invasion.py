@@ -20,7 +20,8 @@ def run_game():
     while True:  # 进入游戏循环
         gf.check_events(ai_settings, screen, ship, bullets)  # 通过按键控制飞船和子弹发射
         ship.update()  # 更新飞船位置
-        gf.update_bullets(bullets)  # 更新子弹位置 并附加上限条件
+        gf.update_bullets(ai_settings, screen, ship, aliens, bullets)  # 更新子弹位置 并附加上限条件
+        gf.update_aliens(ai_settings, ship, aliens)
         gf.update_screen(ai_settings, screen, aliens, ship, bullets)  # 把飞船和子弹在屏幕上画出来
 
 

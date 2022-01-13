@@ -10,7 +10,7 @@ class Ship():
         self.rect = self.image.get_rect()
         # 初始化飞船图片
         self.screen_rect = screen.get_rect()
-        self.ship_speed_factor = 1.5
+        self.ship_speed_factor = ai_settings.ship_speed_factor
         # 获得屏幕位置
 
         self.rect.centerx = self.screen_rect.centerx

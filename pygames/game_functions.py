@@ -80,12 +80,44 @@ def update_screen(ai_settings, screen, aliens, ship, bullets):
     pygame.display.flip()  # 刷新屏幕进行绘制
 
 
-def update_bullets(bullets):  # 去除掉屏幕边缘外子弹
+def update_bullets(ai_settings, screen, ship, aliens, bullets):  # 去除掉屏幕边缘外子弹, 并进行碰撞检测
     bullets.update()  # 继承group中的方法 相当于update每一个元素
     for bullet in bullets.copy():
         if bullet.rect.bottom <= 0:
             bullets.remove(bullet)
-    print(len(bullets))
+
+    check_bullet_alien_collisions(ai_settings, screen, ship, aliens, bullets)
+
+
+def check_bullet_alien_collisions(ai_settings, screen, ship, aliens, bullets):
+    collisions = pygame.sprite.groupcollide(bullets, aliens, True, True)  # 对两个数组中的所有矩形进行碰撞检测，False则全部存在
+    if len(aliens) == 0:
+        bullets.empty()
+        # ai_settings.alien_speed_factor += 0.2  # 难度增加机制
+        create_fleet(ai_settings, screen, ship, aliens)
+    # print(len(bullets))
+
+
+def check_fleet_edges(ai_settings, aliens):
+    for alien in aliens.sprites():
+        # print(alien.rect.x, alien.rect.y)
+        if alien.check_edges():
+            change_fleet_direction(ai_settings, aliens)
+            break  # 注意break缩进位置！
+
+
+def change_fleet_direction(ai_settings, aliens):
+    for alien in aliens.sprites():
+        alien.rect.y += ai_settings.fleet_drop_speed
+    ai_settings.fleet_direction *= -1
+
+
+def update_aliens(ai_settings,ship, aliens):
+    check_fleet_edges(ai_settings, aliens)
+    aliens.update()
+
+    if pygame.sprite.spritecollideany(ship, aliens):
+        print('Ship hit!')
 
 
 def create_fleet(ai_settings, screen, ship, aliens):
@@ -118,4 +150,5 @@ def get_number_rows(ai_settings, ship_height, alien_height):
                          - ship_height)  # 可用的从上到下外星人间距
     number_rows = int(available_space_y / (2 * alien_height))  # 可容纳外星人行数
     return number_rows
+
 
