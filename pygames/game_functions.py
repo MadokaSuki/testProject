@@ -1,5 +1,7 @@
 import sys
 import pygame
+from pygames.alien import Alien
+
 from bullet import Bullet
 
 
@@ -69,19 +71,51 @@ def check_events(ai_settings, screen, ship, bullets):
             check_up_events(event, ai_settings, screen, ship, bullets)
 
 
-def update_screen(ai_settings, screen, alien, ship, bullets):
+def update_screen(ai_settings, screen, aliens, ship, bullets):
     screen.fill(ai_settings.bg_color)  # 背景颜色填充
     for bullet in bullets:
         bullet.draw_bullet()  # 根据所有子弹的坐标绘制子弹
     ship.blitme()  # 绘制飞船
-    alien.blitme()
+    aliens.draw(screen)
     pygame.display.flip()  # 刷新屏幕进行绘制
 
 
 def update_bullets(bullets):  # 去除掉屏幕边缘外子弹
     bullets.update()  # 继承group中的方法 相当于update每一个元素
-
     for bullet in bullets.copy():
         if bullet.rect.bottom <= 0:
             bullets.remove(bullet)
     print(len(bullets))
+
+
+def create_fleet(ai_settings, screen, ship, aliens):
+    alien = Alien(ai_settings, screen)
+    number_aliens_x = get_number_aliens_x(ai_settings, alien.rect.width)
+    number_rows = get_number_rows(ai_settings, ship.rect.height, alien.rect.height)
+    for row_number in range(number_rows):
+        for alien_number in range(number_aliens_x):
+            create_alien(ai_settings, screen, aliens, alien_number, row_number)
+
+
+def get_number_aliens_x(ai_settings, alien_width):
+    available_space_x = ai_settings.screen_width - 2 * alien_width  # 可用的最左到最右端外星人间距
+    number_aliens_x = int(available_space_x / (2 * alien_width))  # 可容纳外星人数量
+    return number_aliens_x
+
+
+def create_alien(ai_settings, screen, aliens, alien_number, row_number):  # 根据可容纳外星人数量
+    alien = Alien(ai_settings, screen)
+    alien_width = alien.rect.width
+    alien.x = alien_width + 2 * alien_width * alien_number
+    alien.rect.x = alien.x
+    alien.rect.y = alien.rect.height + 2 * alien.rect.height * row_number
+    aliens.add(alien)
+
+
+def get_number_rows(ai_settings, ship_height, alien_height):
+    available_space_y = (ai_settings.screen_height
+                         - 3 * alien_height
+                         - ship_height)  # 可用的从上到下外星人间距
+    number_rows = int(available_space_y / (2 * alien_height))  # 可容纳外星人行数
+    return number_rows
+

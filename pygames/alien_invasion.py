@@ -14,12 +14,14 @@ def run_game():
     pygame.display.set_caption("Alien Invasion")  # 设置标题
     ship = Ship(ai_settings, screen)  # 创建飞船
     bullets = Group()  # 创建一个空的bullets组
-    alien = Alien(ai_settings, screen)
+    aliens = Group()
+    gf.create_fleet(ai_settings, screen, ship, aliens)  # 创建多行外星人
+    # alien = Alien(ai_settings, screen)
     while True:  # 进入游戏循环
         gf.check_events(ai_settings, screen, ship, bullets)  # 通过按键控制飞船和子弹发射
         ship.update()  # 更新飞船位置
         gf.update_bullets(bullets)  # 更新子弹位置 并附加上限条件
-        gf.update_screen(ai_settings, screen, alien, ship, bullets)  # 把飞船和子弹在屏幕上画出来
+        gf.update_screen(ai_settings, screen, aliens, ship, bullets)  # 把飞船和子弹在屏幕上画出来
 
 
 # 总体逻辑：先创建飞船和子弹本体（存在初始位置），
