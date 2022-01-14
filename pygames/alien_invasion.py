@@ -5,6 +5,7 @@ from ship import Ship
 from pygame.sprite import Group
 import game_functions as gf
 from button import Button
+from scoreboard import Scoreboard
 
 
 def run_game():
@@ -16,6 +17,7 @@ def run_game():
     play_button = Button(ai_settings, screen, 'Play')
 
     stats = GameStats(ai_settings)
+    sb = Scoreboard(ai_settings, screen, stats)
     ship = Ship(ai_settings, screen)  # 创建飞船
     bullets = Group()  # 创建一个空的bullets组
     aliens = Group()
@@ -26,9 +28,9 @@ def run_game():
 
         if stats.game_active:
             ship.update()  # 更新飞船位置
-            gf.update_bullets(ai_settings, screen, ship, aliens, bullets)  # 更新子弹位置 并附加上限条件
+            gf.update_bullets(ai_settings, screen, ship, aliens, bullets, stats)  # 更新子弹位置 并附加上限条件
             gf.update_aliens(ai_settings, stats, screen, ship, aliens, bullets)
-        gf.update_screen(ai_settings, screen, stats, aliens, ship, bullets, play_button)  # 把飞船和子弹在屏幕上画出来
+        gf.update_screen(ai_settings, screen, stats, aliens, ship, bullets, play_button, sb)  # 把飞船和子弹在屏幕上画出来
 
 
 # 总体逻辑：先创建飞船和子弹本体（存在初始位置），

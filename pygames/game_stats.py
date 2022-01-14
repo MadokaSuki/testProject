@@ -7,3 +7,7 @@ class GameStats():
 
     def reset_stats(self):
         self.ships_left = self.ai_settings.ship_limit
+        self.score = 0
+        self.shoot_accuracy = float(0)
+        self.shoot_times = float(0)
+        self.hit_times = float(0)

@@ -7,10 +7,11 @@ from bullet import Bullet
 
 
 # 空格开火
-def fire_bullet(ai_settings, screen, ship, bullets):
+def fire_bullet(ai_settings, screen, ship, bullets, stats):
     new_bullet = Bullet(ai_settings, screen, ship)  # 传入屏幕和飞船位置以确认新的子弹位置
     if len(bullets) < new_bullet.bullet_max:
         bullets.add(new_bullet)
+        stats.shoot_times += 1
 
 
 # 改变速度("," ".")
@@ -25,7 +26,7 @@ def change_speed(event, ship):
 
 
 # 按下按键
-def check_down_events(event, ai_settings, screen, ship, bullets):
+def check_down_events(event, ai_settings, screen, ship, bullets, stats):
     if event.key == pygame.K_RIGHT:
         ship.moving_right = True
     elif event.key == pygame.K_LEFT:
@@ -38,7 +39,7 @@ def check_down_events(event, ai_settings, screen, ship, bullets):
         ship.return_center = True
     # 飞船移动控制（按键检测函数） h回到原位
     elif event.key == pygame.K_SPACE:
-        fire_bullet(ai_settings, screen, ship, bullets)
+        fire_bullet(ai_settings, screen, ship, bullets, stats)
     elif event.key == pygame.K_ESCAPE:
         sys.exit()
     # 开火函数
@@ -70,7 +71,7 @@ def check_events(ai_settings, screen, stats, play_button, ship, aliens, bullets)
             mouse_x, mouse_y = pygame.mouse.get_pos()
             check_play_button(ai_settings, screen, stats, play_button, ship, aliens, bullets, mouse_x, mouse_y)
         elif event.type == pygame.KEYDOWN:  # 按下按键
-            check_down_events(event, ai_settings, screen, ship, bullets)
+            check_down_events(event, ai_settings, screen, ship, bullets, stats)
         elif event.type == pygame.KEYUP:  # 松开按键
             check_up_events(event, ai_settings, screen, ship, bullets)
 
@@ -79,6 +80,7 @@ def check_play_button(ai_settings, screen, stats, play_button, ship, aliens, bul
     button_clicked = play_button.rect.collidepoint(mouse_x, mouse_y)  # 检查鼠标位置是否在play_button内
     if button_clicked and not stats.game_active:  # 游戏未激活并且点击按钮才启用
         pygame.mouse.set_visible(False)  # 隐藏鼠标
+        ai_settings.initialize_dynamic_settings()
         stats.reset_stats()  # 重置最大游玩次数
         stats.game_active = True
 
@@ -89,31 +91,43 @@ def check_play_button(ai_settings, screen, stats, play_button, ship, aliens, bul
         ship.center_ship()
 
 
-def update_screen(ai_settings, screen, stats, aliens, ship, bullets, play_button):
+def update_screen(ai_settings, screen, stats, aliens, ship, bullets, play_button, sb):
     screen.fill(ai_settings.bg_color)  # 背景颜色填充
     for bullet in bullets:
         bullet.draw_bullet()  # 根据所有子弹的坐标绘制子弹
     ship.blitme()  # 绘制飞船
     aliens.draw(screen)
+    sb.show_score()
     if not stats.game_active:
         play_button.draw_button()
     pygame.display.flip()  # 刷新屏幕进行绘制
 
 
-def update_bullets(ai_settings, screen, ship, aliens, bullets):  # 去除掉屏幕边缘外子弹, 并进行碰撞检测
+def update_bullets(ai_settings, screen, ship, aliens, bullets, stats):  # 去除掉屏幕边缘外子弹, 并进行碰撞检测
     bullets.update()  # 继承group中的方法 相当于update每一个元素
     for bullet in bullets.copy():
         if bullet.rect.bottom <= 0:
             bullets.remove(bullet)
+            update_shoot_accuracy(stats)
 
-    check_bullet_alien_collisions(ai_settings, screen, ship, aliens, bullets)
+    check_bullet_alien_collisions(ai_settings, screen, ship, aliens, bullets, stats)
 
 
-def check_bullet_alien_collisions(ai_settings, screen, ship, aliens, bullets):
-    collisions = pygame.sprite.groupcollide(bullets, aliens, True, True)  # 对两个数组中的所有矩形进行碰撞检测，False则全部存在
+def update_shoot_accuracy(stats):  # 更新准确率
+    if stats.shoot_times != 0:
+        print(stats.hit_times / stats.shoot_times * 100)
+
+
+def check_bullet_alien_collisions(ai_settings, screen, ship, aliens, bullets, stats):
+    collisions = pygame.sprite.groupcollide(bullets, aliens, True, True)
+    if collisions:
+        stats.hit_times += 1
+        update_shoot_accuracy(stats)
+        # print("%.2f %" % (stats.hit_times / stats.shoot_times * 100))
     if len(aliens) == 0:
         bullets.empty()
         # ai_settings.alien_speed_factor += 0.2  # 难度增加机制
+        ai_settings.increase_speed()
         create_fleet(ai_settings, screen, ship, aliens)
     # print(len(bullets))
 
