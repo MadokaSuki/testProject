@@ -7,7 +7,7 @@ class Bullet(Sprite):
         super().__init__()
         self.ai_settings = ai_settings
         self.bullet_height = 15
-        self.bullet_width = 300
+        self.bullet_width = 3
         self.bullet_color = 60, 60, 60
         self.bullet_max = 5
         self.screen = screen

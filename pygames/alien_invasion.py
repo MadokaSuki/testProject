@@ -1,9 +1,10 @@
 import pygame
+from game_stats import GameStats
 from settings import Settings
 from ship import Ship
 from pygame.sprite import Group
-from alien import Alien
 import game_functions as gf
+from button import Button
 
 
 def run_game():
@@ -12,17 +13,22 @@ def run_game():
     screen = pygame.display.set_mode((ai_settings.screen_width,
                                       ai_settings.screen_height))  # 设置屏幕大小
     pygame.display.set_caption("Alien Invasion")  # 设置标题
+    play_button = Button(ai_settings, screen, 'Play')
+
+    stats = GameStats(ai_settings)
     ship = Ship(ai_settings, screen)  # 创建飞船
     bullets = Group()  # 创建一个空的bullets组
     aliens = Group()
     gf.create_fleet(ai_settings, screen, ship, aliens)  # 创建多行外星人
     # alien = Alien(ai_settings, screen)
     while True:  # 进入游戏循环
-        gf.check_events(ai_settings, screen, ship, bullets)  # 通过按键控制飞船和子弹发射
-        ship.update()  # 更新飞船位置
-        gf.update_bullets(ai_settings, screen, ship, aliens, bullets)  # 更新子弹位置 并附加上限条件
-        gf.update_aliens(ai_settings, ship, aliens)
-        gf.update_screen(ai_settings, screen, aliens, ship, bullets)  # 把飞船和子弹在屏幕上画出来
+        gf.check_events(ai_settings, screen, stats, play_button, ship, aliens, bullets)  # 通过按键控制飞船和子弹发射
+
+        if stats.game_active:
+            ship.update()  # 更新飞船位置
+            gf.update_bullets(ai_settings, screen, ship, aliens, bullets)  # 更新子弹位置 并附加上限条件
+            gf.update_aliens(ai_settings, stats, screen, ship, aliens, bullets)
+        gf.update_screen(ai_settings, screen, stats, aliens, ship, bullets, play_button)  # 把飞船和子弹在屏幕上画出来
 
 
 # 总体逻辑：先创建飞船和子弹本体（存在初始位置），
