@@ -24,12 +24,12 @@ def run_game():
     gf.create_fleet(ai_settings, screen, ship, aliens)  # 创建多行外星人
     # alien = Alien(ai_settings, screen)
     while True:  # 进入游戏循环
-        gf.check_events(ai_settings, screen, stats, play_button, ship, aliens, bullets)  # 通过按键控制飞船和子弹发射
+        gf.check_events(ai_settings, screen, stats, play_button, ship, aliens, bullets, sb)  # 通过按键控制飞船和子弹发射
 
         if stats.game_active:
             ship.update()  # 更新飞船位置
-            gf.update_bullets(ai_settings, screen, ship, aliens, bullets, stats)  # 更新子弹位置 并附加上限条件
-            gf.update_aliens(ai_settings, stats, screen, ship, aliens, bullets)
+            gf.update_bullets(ai_settings, screen, ship, aliens, bullets, stats, sb)  # 更新子弹位置 并附加上限条件
+            gf.update_aliens(ai_settings, stats, screen, ship, aliens, bullets, sb)
         gf.update_screen(ai_settings, screen, stats, aliens, ship, bullets, play_button, sb)  # 把飞船和子弹在屏幕上画出来
 
 

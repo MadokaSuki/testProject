@@ -13,7 +13,7 @@ class Bullet(Sprite):
         self.screen = screen
         self.speed_factor = ai_settings.bullet_speed_factor
 
-        self.rect = pygame.Rect(0, 0, self.bullet_width, self.bullet_height) # 设置子弹的矩形形状
+        self.rect = pygame.Rect(0, 0, self.bullet_width, self.bullet_height)  # 设置子弹的矩形形状
         self.rect.centerx = ship.rect.centerx
         self.rect.top = ship.rect.top
         self.y = float(self.rect.y)  # 浮点化使其更精确
